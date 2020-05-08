@@ -8,17 +8,24 @@
     navbar = document.querySelector '#nav-top nav'
     if !navbar => return
 
-    view = new ldView root: ld$.find(navbar, '[ld-scope]',0), handler: do
-      displayname: ({node}) -> node.innerText = lc.user.displayname or \You
-      login: ({node}) -> node.classList.toggle \d-none, lc.signed
-      signup: ({node}) -> node.classList.toggle \d-none, lc.signed
-      "upgrade-now": ({node}) -> node.classList.toggle \d-none, lc.pro
-      profile:  ({node}) -> node.classList.toggle \d-none, !lc.signed
-      avatar: ({node}) -> if lc.signed => node.style.backgroundImage = "url(/s/avatar/#{lc.user.key}.png)"
-      plan: ({node}) ->
-        node.innerText = if lc.pro => \PRO else \FREE
-        node.classList.toggle \badge-primary, lc.pro
-        node.classList.toggle \badge-secondary, !lc.pro
+    view = new ldView do
+      root: ld$.find(navbar, '[ld-scope]',0)
+      action: click: do
+        signup: -> lda.auth.show \signup
+        login: -> lda.auth.show \login
+        logout: -> lda.auth.logout!
+      handler: do
+        displayname: ({node}) -> node.innerText = lc.user.displayname or \You
+        login: ({node}) -> node.classList.toggle \d-none, lc.signed
+        signup: ({node}) -> node.classList.toggle \d-none, lc.signed
+        "upgrade-now": ({node}) -> node.classList.toggle \d-none, lc.pro
+        profile:  ({node}) -> node.classList.toggle \d-none, !lc.signed
+        avatar: ({node}) -> if lc.signed => node.style.backgroundImage = "url(/s/avatar/#{lc.user.key}.png)"
+        plan: ({node}) ->
+          node.innerText = if lc.pro => \PRO else \FREE
+          node.classList.toggle \badge-primary, lc.pro
+          node.classList.toggle \badge-secondary, !lc.pro
+
     ldc.on \auth.change, nav-check
     auth.get!then nav-check
 

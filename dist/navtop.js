@@ -20,6 +20,19 @@
     }
     view = new ldView({
       root: ld$.find(navbar, '[ld-scope]', 0),
+      action: {
+        click: {
+          signup: function(){
+            return lda.auth.show('signup');
+          },
+          login: function(){
+            return lda.auth.show('login');
+          },
+          logout: function(){
+            return lda.auth.logout();
+          }
+        }
+      },
       handler: {
         displayname: function(arg$){
           var node;
