@@ -1,6 +1,7 @@
 {
   "author": "zbryikt",
-  "name": "ldSite",
+  "name": "ldsite",
+  "main": "dist/ldsite.js",
   "license": "MIT",
   "description": "necessary frontend cores for a generic website",
   "version": "0.0.1",
