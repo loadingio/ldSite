@@ -4,7 +4,7 @@
   "main": "dist/ldsite.js",
   "license": "MIT",
   "description": "necessary frontend cores for a generic website",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/loadingio/ldSite",
   "repository": {
     "type": "git",
