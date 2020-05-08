@@ -184,21 +184,19 @@ var slice$ = [].slice;
         return results$;
       },
       'switch': function(act){
-        var p;
+        var p, this$ = this;
         if (!(act === 'signup' || act === 'login')) {
           return;
         }
-        console.log('here');
         p = !lc.authpanel
           ? ldcvmgr.getdom('authpanel')
           : Promise.resolve(lc.authpanel);
         return p.then(function(authpanel){
           var x$;
-          console.log('here2');
           initAuthpanel(authpanel);
           x$ = ld$.find(authpanel, '.authpanel', 0).classList;
           x$.remove('signup', 'login');
-          x$.add(this.act = act);
+          x$.add(this$.act = act);
           return lc.form.check({
             now: true
           });
@@ -528,14 +526,12 @@ function in$(x, xs){
         }
         this.loader.on(1000);
         return this.workers[n] = fetch("/modules/cover/" + n + ".html").then(function(v){
-          console.log(1);
           if (!(v && v.ok)) {
             throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
           }
           return v.text();
         }).then(function(it){
           var div, root;
-          console.log(2);
           document.body.appendChild(div = document.createElement("div"));
           div.innerHTML = it;
           ld$.find(div, 'script').map(function(it){
@@ -554,10 +550,8 @@ function in$(x, xs){
             root: root,
             lock: root.getAttribute('data-lock') === 'true'
           });
-          console.log(3);
           ldcvmgr.prepareProxy.resolve();
           delete this$.workers[n];
-          console.log(4);
           return debounce(1);
         })['finally'](function(){
           return this$.loader.cancel();
@@ -595,7 +589,6 @@ function in$(x, xs){
       getdom: function(n){
         var this$ = this;
         return this.prepare(n).then(function(){
-          console.log('getdom');
           return this$.covers[n].root;
         });
       },

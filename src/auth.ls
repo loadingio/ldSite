@@ -94,7 +94,7 @@
     switch: (act) ->
       if !(act in <[signup login]>) => return
       p = if !lc.authpanel => ldcvmgr.getdom(\authpanel) else Promise.resolve(lc.authpanel)
-      p.then (authpanel) ->
+      p.then (authpanel) ~>
         init-authpanel authpanel
         ld$.find(authpanel,'.authpanel',0).classList
           ..remove \signup, \login

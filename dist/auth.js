@@ -184,21 +184,19 @@ var slice$ = [].slice;
         return results$;
       },
       'switch': function(act){
-        var p;
+        var p, this$ = this;
         if (!(act === 'signup' || act === 'login')) {
           return;
         }
-        console.log('here');
         p = !lc.authpanel
           ? ldcvmgr.getdom('authpanel')
           : Promise.resolve(lc.authpanel);
         return p.then(function(authpanel){
           var x$;
-          console.log('here2');
           initAuthpanel(authpanel);
           x$ = ld$.find(authpanel, '.authpanel', 0).classList;
           x$.remove('signup', 'login');
-          x$.add(this.act = act);
+          x$.add(this$.act = act);
           return lc.form.check({
             now: true
           });

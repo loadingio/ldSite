@@ -30,14 +30,12 @@
         }
         this.loader.on(1000);
         return this.workers[n] = fetch("/modules/cover/" + n + ".html").then(function(v){
-          console.log(1);
           if (!(v && v.ok)) {
             throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
           }
           return v.text();
         }).then(function(it){
           var div, root;
-          console.log(2);
           document.body.appendChild(div = document.createElement("div"));
           div.innerHTML = it;
           ld$.find(div, 'script').map(function(it){
@@ -56,10 +54,8 @@
             root: root,
             lock: root.getAttribute('data-lock') === 'true'
           });
-          console.log(3);
           ldcvmgr.prepareProxy.resolve();
           delete this$.workers[n];
-          console.log(4);
           return debounce(1);
         })['finally'](function(){
           return this$.loader.cancel();
@@ -97,7 +93,6 @@
       getdom: function(n){
         var this$ = this;
         return this.prepare(n).then(function(){
-          console.log('getdom');
           return this$.covers[n].root;
         });
       },
