@@ -3,8 +3,9 @@
   return ldc.register('loader', [], function(){
     var ldld, h;
     ldld = new ldLoader({
-      root: document.body,
-      autoZ: true
+      className: 'ldld full',
+      autoZ: true,
+      atomic: false
     });
     h = null;
     return {
