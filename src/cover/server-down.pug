@@ -1,0 +1,13 @@
+include /modules/common.pug
+.ldcv.ldcvmgr(data-lock="true",data-name="error"): .base.w-640.rwd: .inner.card: .card-body.text-center: .p-4
+  h1 Ooops, Server Down
+  p We can't proceed if our server is down
+  br
+  .m-auto.text-left.text-muted
+    p Sorry but our system is not able to respond to your last request. It might be that we are upgrading the service, or something was broken in our service.
+    p We should have been working on this issue now, so you can try again later or #[a(href="#",onclick="lda.ldcvmgr.toggle('contact')") contact us] to see if there is anything we can do for you.
+    br
+
+    .row.no-gutters
+      .col-md.mr-2: .btn.btn-outline-dark.btn-block.btn-lg(onclick="lda.ldcvmgr.toggle('contact')") Contact Us
+      .col-md.ml-2: .btn.btn-primary.btn-block.btn-lg(onclick="window.location.reload()") Retry

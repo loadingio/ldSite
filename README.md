@@ -16,3 +16,18 @@ necessary frontend cores for a generic website, including:
    - Cookie parser
 
 You can find corresponding documentation under `doc` folder.
+
+# Covers
+
+Cores in ldSite use following covers through ldcvmgr:
+
+ * logout
+ * error
+ * server-down
+ * contact
+ * error-413
+ * error-403
+ * error-400
+ * assets-quota-exceeded
+ * csrftoken-mismatch
+ * authpanel

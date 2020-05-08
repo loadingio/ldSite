@@ -1,0 +1,10 @@
+include /modules/common.pug
+.ldcv.ldcvmgr(data-name="error-413"): .base.w-640.rwd: .inner.card: .card-body.text-center: .p-4
+  h1 Ooops, File Too Large.
+  p We can't process your request because it's too big.
+  br
+  .m-auto.text-left.text-muted
+    p Sorry but you were sending something that exceeds our size limit, thus the request was rejected and your action was failed.
+    p You can try with alternative configs or files(if any) to reduce the file size, then try again to see if it fixes this issue.
+    br
+    .btn.btn-primary.btn-block.btn-lg.mr-2(data-ldcv-set="") Close This Popup

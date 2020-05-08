@@ -1,0 +1,9 @@
+include /modules/common.pug
+.ldcv.ldcvmgr(data-lock="true",data-name="logout"): .base.w-640.rwd: .inner.card: .card-body.text-center: .p-4
+  h1 Logged Out.
+  p Refresh to keep things updated and consistent.
+  br
+  .m-auto.text-left.text-muted
+    p Some features in are provided only to the users that have logged in. Sign-in panel will be popped up again when you are going to use those features.
+    br
+    .btn.btn-primary.btn-block.btn-lg.mr-2(onclick="window.location.reload()") Refresh

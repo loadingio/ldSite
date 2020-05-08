@@ -1,0 +1,12 @@
+include /modules/common.pug
+.ldcv.ldcvmgr(data-name="error"): .base.w-640.rwd: .inner.card: .card-body.text-center: .p-4
+  h1 Ooops, Things Broken.
+  p We failed to finish your last action/request
+  br
+  .m-auto.text-left.text-muted
+    p Sorry but something went wrong in our system about what you want to do, so your last action might have failed.
+    p You can try again later or #[a(href="#",onclick="lda.ldcvmgr.toggle('contact')") contact us] to see if there is anything we can do for you.
+    br
+    .row.no-gutters
+      .col-md.mr-2: .btn.btn-outline-dark.btn-block.btn-lg.mr-2(onclick="lda.ldcvmgr.toggle('contact')") Contact Us
+      .col-md.ml-2: .btn.btn-primary.btn-block.btn-lg.mr-2(data-ldcv-set="") Close This Popup

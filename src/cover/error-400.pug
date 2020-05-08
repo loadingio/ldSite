@@ -1,0 +1,12 @@
+include /modules/common.pug
+.ldcv.ldcvmgr(data-name="error-400"): .base.w-640.rwd: .inner.card: .card-body.text-center: .p-4
+  h1 Ooops, Bad Request
+  p We can't process your request because it's format is incorrect.
+  br
+  .m-auto.text-left.text-muted
+    p Sorry but our program failed to parse something in your last request, thus the request was rejected and your action was failed.
+    p You can try again later or contact us to see if there is anything we can do for you.
+    br
+    .row.no-gutters
+      .col-md.mr-2: .btn.btn-outline-dark.btn-block.btn-lg.mr-2(onclick="lda.ldcvmgr.toggle('contact')") Contact Us
+      .col-md.ml-2: .btn.btn-primary.btn-block.btn-lg.mr-2(data-ldcv-set="") Close This Popup

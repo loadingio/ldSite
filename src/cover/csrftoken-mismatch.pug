@@ -1,0 +1,17 @@
+include /modules/common.pug
++scope("csrftoken-mismatch").ldcv.ldcvmgr(data-lock,data-name="csrftoken-mismatch")
+  .base.w-640.rwd: .inner.card: .card-body.text-center: .p-4
+    h1 Something Wrong
+    p please reload / relogin and try again.
+    br
+    .m-auto.text-left.text-muted
+      p Something went wrong while that might be able to be fixed after a re-login or a reload.
+      p Please reload your browser or click the following button to refresh your session for resolving this issue.
+      br
+      a.btn.btn-primary.btn-block.btn-lg.mr-2(ld="reload",href="#") Re-login
+    script: :lsc
+      (->
+        new ldView root: '[data-name=csrftoken-mismatch]', action: click: do
+          reload: ({node,evt}) ->
+            window.location.href = "/me/reauth/?nexturl=#{encodeURIComponent window.location.pathname}"
+      )!
