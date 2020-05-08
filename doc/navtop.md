@@ -16,6 +16,7 @@ Handle the dynamics of site-level navigation bar. Need following DOMs:
      - profile - menu item for link to user profile
      - avatar - node for showing user's avatar.
      - plan - node for showing user's plan name.
+     - logout - logout menu item
 
 
 Supported attributes over `#nav-top nav` element:
