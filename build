@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+mkdir -p dist
+
+rm -f dist/ldsite.js
+rm -f dist/ldsite.min.js
+
+for name in auth error ldcvmgr loader navtop notify recaptcha
+do
+  echo "build src/$name.ls -> dist/$name.js ..."
+  ./node_modules/.bin/lsc -cbp src/$name.ls > dist/$name.js
+  echo "minifying $name.js ..."
+  ./node_modules/.bin/uglifyjs dist/$name.js > dist/$name.min.js
+  cat dist/$name.js >> dist/ldsite.js
+done
+
+echo "minifying ldsite.js ..."
+./node_modules/.bin/uglifyjs dist/ldsite.js > dist/ldsite.min.js
+
+echo "done."
+
