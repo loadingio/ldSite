@@ -3,8 +3,8 @@
   ({ldcvmgr,loader,util,error,recaptcha}) <- ldc.register \auth, <[ldcvmgr loader util error recaptcha]>, _
 
   #prevent global object been altered accidentally
-  global = -> if local.global => JSON.parse(JSON.stringify local.global) else null
-  [local,el] = [{}, {}]
+  global = -> if lc.global => JSON.parse(JSON.stringify lc.global) else null
+  [lc,el] = [{}, {}]
 
   # cookie consent
   consent = do
@@ -25,10 +25,18 @@
       @check!
   consent.init!
 
-  if ld$.find(document, '.authpanel', 0) =>
+  init-authpanel = (dom) ->
+    authpanel = lc.authpanel = if dom => that else ld$.find document, \.authpanel, 0
+    if !lc.authpanel => return
+
+    acts = ld$.find authpanel, '[data-action]'
+    authpanel.addEventListener \click, (e) ->
+      if !e or !(n = e.target) or !e.target.getAttribute => return
+      act = e.target.getAttribute \data-action
+      auth.switch act
 
     # typical auth check flow
-    form = new ldForm do
+    lc.form = form = new ldForm do
       names: -> <[email passwd displayname]>
       after-check: (s, f) ->
         if s.email != 1 and !/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.[a-z]{2,}|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i.exec(f.email.value) => s.email = 2
@@ -37,8 +45,8 @@
           else s.passwd = if !f.passwd.value => 1 else 0
         if auth.act == \login => s.displayname = 0
         else s.displayname = if !f.displayname.value => 1 else if !!f.displayname.value => 0 else 2
-      root: \.authpanel
-    el.submit = ld$.find(document, '.authpanel .btn[data-action=submit]', 0)
+      root: authpanel
+    el.submit = ld$.find(authpanel, '[data-action=submit]', 0)
     ldld = new ldLoader root: el.submit
     form.on \readystatechange, -> el.submit.classList.toggle \disabled, !it
     form.field('passwd').addEventListener \keyup, (e) ->
@@ -74,16 +82,8 @@
           form.check {n: \passwd, now: true}
           ldld.off!
 
-  authpanel = ld$.find document, \.authpanel, 0
-  if authpanel =>
-    acts = ld$.find authpanel, '[data-action]'
-    authpanel.addEventListener \click, (e) ->
-      if !e or !(n = e.target) or !e.target.getAttribute => return
-      act = e.target.getAttribute \data-action
-      auth.switch act
-
   # get global object. put it here so it can't be resolved by user from dev console.
-  get = proxise -> if local.global => return Promise.resolve local.global
+  get = proxise -> if lc.global => return Promise.resolve lc.global
 
   # typical auth chek flow
   # get -> auth.show -> authpanel.show -> authpanel resolved -> ldc.auth.fetch -> get.resolved
@@ -93,9 +93,13 @@
     fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
     switch: (act) ->
       if !(act in <[signup login]>) => return
-      authpanel.classList.remove \signup, \login
-      authpanel.classList.add @act = act
-      form.check {now: true}
+      p = if !lc.authpanel => ldcvmgr.getdom(\authpanel) else Promise.resolve(lc.authpanel)
+      p.then (authpanel) ->
+        init-authpanel authpanel
+        ld$.find(authpanel,'.authpanel',0).classList
+          ..remove \signup, \login
+          ..add @act = act
+        lc.form.check {now: true}
     social: (name) ->
       des = window.open '', 'social-login', 'height=640,width=560'
       div = ld$.create name: \div
@@ -182,8 +186,8 @@
           hint-fail.cancel!
           loader.cancel!
           ld$.fetch.{}headers['X-CSRF-Token'] = it.csrfToken
-          local.global = it
-          local.global.location = (if ip-from-taiwan? => (if ip-from-taiwan it.ip => \tw else \other) else undefined)
+          lc.global = it
+          lc.global.location = (if ip-from-taiwan? => (if ip-from-taiwan it.ip => \tw else \other) else undefined)
           ret = global!
           get.resolve ret
           try
@@ -224,7 +228,7 @@
         .then -> if it => auth.fetch! # re-fetch only if get return sth.
     hide: (obj = null) -> ldcvmgr.set \authpanel, obj # default hide set with nothing to indicate a cancel.
     info: (name = \default) ->
-      infos = ld$.find(authpanel, '*[data-info]')
+      infos = ld$.find(lc.authpanel, '*[data-info]')
       hash = {}
       infos.map -> hash[it.getAttribute(\data-info)] = it
       infos.map -> it.classList.add \d-none

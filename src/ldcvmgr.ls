@@ -8,10 +8,13 @@
   ldcvmgr = do
     loader: new ldLoader className: "ldld full", auto-z: true
     covers: covers = {}
+    workers: {}
+    prepare-proxy: proxise (n) ->
     prepare: (n) ->
       if @covers[n] => return Promise.resolve!
+      if @workers[n] => return @prepare-proxy(n)
       @loader.on 1000
-      fetch "/modules/cover/#n.html"
+      @workers[n] = fetch "/modules/cover/#n.html"
         .then (v) ~>
           if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
           v.text!
@@ -24,6 +27,8 @@
             it.parentNode.replaceChild script, it
           root = div.querySelector('.ldcv')
           @covers[n] = new ldCover root: root, lock: root.getAttribute(\data-lock) == \true
+          ldcvmgr.prepare-proxy.resolve!
+          delete @workers[n]
           debounce 1
         .finally ~> @loader.cancel!
         .catch ~> throw it
@@ -37,8 +42,7 @@
     getcover: (n) -> @prepare n .then ~> @covers[n]
     getdom: (n) -> @prepare n .then ~> @covers[n].root
     is-on: (n) -> @covers[n] and @covers[n].is-on!
-    set: (n, p) ->
-      @prepare(n).then ~> @covers[n].set p
+    set: (n, p) -> @prepare(n).then ~> @covers[n].set p
     get: (n, p) ->
       @prepare(n)
         .then ~> ldc.fire "ldcvmgr.#n.on", {node: @covers[n], param: p}

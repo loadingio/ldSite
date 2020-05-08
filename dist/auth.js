@@ -2,16 +2,16 @@
 var slice$ = [].slice;
 (function(){
   return ldc.register('auth', ['ldcvmgr', 'loader', 'util', 'error', 'recaptcha'], function(arg$){
-    var ldcvmgr, loader, util, error, recaptcha, global, ref$, local, el, consent, form, ldld, submit, authpanel, acts, get, auth, action;
+    var ldcvmgr, loader, util, error, recaptcha, global, ref$, lc, el, consent, initAuthpanel, get, auth, action;
     ldcvmgr = arg$.ldcvmgr, loader = arg$.loader, util = arg$.util, error = arg$.error, recaptcha = arg$.recaptcha;
     global = function(){
-      if (local.global) {
-        return JSON.parse(JSON.stringify(local.global));
+      if (lc.global) {
+        return JSON.parse(JSON.stringify(lc.global));
       } else {
         return null;
       }
     };
-    ref$ = [{}, {}], local = ref$[0], el = ref$[1];
+    ref$ = [{}, {}], lc = ref$[0], el = ref$[1];
     consent = {
       dom: ld$.find(document, '[ld-scope=cookie-consent]', 0),
       val: util.cookie('legal'),
@@ -57,8 +57,24 @@ var slice$ = [].slice;
       }
     };
     consent.init();
-    if (ld$.find(document, '.authpanel', 0)) {
-      form = new ldForm({
+    initAuthpanel = function(dom){
+      var authpanel, that, acts, form, ldld, submit;
+      authpanel = lc.authpanel = (that = dom)
+        ? that
+        : ld$.find(document, '.authpanel', 0);
+      if (!lc.authpanel) {
+        return;
+      }
+      acts = ld$.find(authpanel, '[data-action]');
+      authpanel.addEventListener('click', function(e){
+        var n, act;
+        if (!e || !(n = e.target) || !e.target.getAttribute) {
+          return;
+        }
+        act = e.target.getAttribute('data-action');
+        return auth['switch'](act);
+      });
+      lc.form = form = new ldForm({
         names: function(){
           return ['email', 'passwd', 'displayname'];
         },
@@ -81,9 +97,9 @@ var slice$ = [].slice;
               : !!f.displayname.value ? 0 : 2;
           }
         },
-        root: '.authpanel'
+        root: authpanel
       });
-      el.submit = ld$.find(document, '.authpanel .btn[data-action=submit]', 0);
+      el.submit = ld$.find(authpanel, '[data-action=submit]', 0);
       ldld = new ldLoader({
         root: el.submit
       });
@@ -102,7 +118,7 @@ var slice$ = [].slice;
       el.submit.addEventListener('click', function(){
         return submit();
       });
-      submit = function(){
+      return submit = function(){
         if (!form.ready()) {
           return;
         }
@@ -146,22 +162,10 @@ var slice$ = [].slice;
           return ldld.off();
         });
       };
-    }
-    authpanel = ld$.find(document, '.authpanel', 0);
-    if (authpanel) {
-      acts = ld$.find(authpanel, '[data-action]');
-      authpanel.addEventListener('click', function(e){
-        var n, act;
-        if (!e || !(n = e.target) || !e.target.getAttribute) {
-          return;
-        }
-        act = e.target.getAttribute('data-action');
-        return auth['switch'](act);
-      });
-    }
+    };
     get = proxise(function(){
-      if (local.global) {
-        return Promise.resolve(local.global);
+      if (lc.global) {
+        return Promise.resolve(lc.global);
       }
     });
     auth = {
@@ -180,13 +184,24 @@ var slice$ = [].slice;
         return results$;
       },
       'switch': function(act){
+        var p;
         if (!(act === 'signup' || act === 'login')) {
           return;
         }
-        authpanel.classList.remove('signup', 'login');
-        authpanel.classList.add(this.act = act);
-        return form.check({
-          now: true
+        console.log('here');
+        p = !lc.authpanel
+          ? ldcvmgr.getdom('authpanel')
+          : Promise.resolve(lc.authpanel);
+        return p.then(function(authpanel){
+          var x$;
+          console.log('here2');
+          initAuthpanel(authpanel);
+          x$ = ld$.find(authpanel, '.authpanel', 0).classList;
+          x$.remove('signup', 'login');
+          x$.add(this.act = act);
+          return lc.form.check({
+            now: true
+          });
         });
       },
       social: function(name){
@@ -318,8 +333,8 @@ var slice$ = [].slice;
           hintFail.cancel();
           loader.cancel();
           ((ref$ = ld$.fetch).headers || (ref$.headers = {}))['X-CSRF-Token'] = it.csrfToken;
-          local.global = it;
-          local.global.location = typeof ipFromTaiwan != 'undefined' && ipFromTaiwan !== null ? ipFromTaiwan(it.ip) ? 'tw' : 'other' : undefined;
+          lc.global = it;
+          lc.global.location = typeof ipFromTaiwan != 'undefined' && ipFromTaiwan !== null ? ipFromTaiwan(it.ip) ? 'tw' : 'other' : undefined;
           ret = global();
           get.resolve(ret);
           try {
@@ -397,7 +412,7 @@ var slice$ = [].slice;
       info: function(name){
         var infos, hash;
         name == null && (name = 'default');
-        infos = ld$.find(authpanel, '*[data-info]');
+        infos = ld$.find(lc.authpanel, '*[data-info]');
         hash = {};
         infos.map(function(it){
           return hash[it.getAttribute('data-info')] = it;
