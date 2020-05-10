@@ -10,5 +10,5 @@
     on: -> ldld.on!
     off: -> ldld.off!
     on-later: (ms = 500) -> @cancel!; h := setTimeout (-> ldld.on! ), ms
-    cancel: -> clearTimeout h; ldld.off!
+    cancel: -> clearTimeout h
 )!

@@ -673,8 +673,7 @@ function in$(x, xs){
         }, ms);
       },
       cancel: function(){
-        clearTimeout(h);
-        return ldld.off();
+        return clearTimeout(h);
       }
     };
   });
