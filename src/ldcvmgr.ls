@@ -33,6 +33,11 @@
         .finally ~> @loader.cancel!
         .catch ~> throw it
     purge: (n) -> if n? => delete @covers[n] else @covers = {}
+    lock: (n, p) ->
+      @prepare(n)
+        .then ~> @covers[n].lock!
+        .then ~> @covers[n].toggle true
+        .catch -> error(n,it)
     toggle: (n, v, p) ->
       @prepare(n)
         .then ~> @covers[n].toggle v
@@ -60,5 +65,6 @@
     toggle: (n,v,p) -> ldcvmgr.toggle n,v,p
     purge: (n) -> ldcvmgr.purge n
     get: (n,p) -> ldcvmgr.get n,p
+    lock: (n,p) -> ldcvmgr.lock n,p
   return ldcvmgr
 )!

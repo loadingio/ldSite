@@ -71,6 +71,16 @@
           return this.covers = {};
         }
       },
+      lock: function(n, p){
+        var this$ = this;
+        return this.prepare(n).then(function(){
+          return this$.covers[n].lock();
+        }).then(function(){
+          return this$.covers[n].toggle(true);
+        })['catch'](function(it){
+          return error(n, it);
+        });
+      },
       toggle: function(n, v, p){
         var this$ = this;
         return this.prepare(n).then(function(){
@@ -147,6 +157,9 @@
       },
       get: function(n, p){
         return ldcvmgr.get(n, p);
+      },
+      lock: function(n, p){
+        return ldcvmgr.lock(n, p);
       }
     });
     return ldcvmgr;
