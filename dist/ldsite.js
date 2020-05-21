@@ -364,7 +364,9 @@ var slice$ = [].slice;
           hintFail.cancel();
           loader.cancel();
           ldcvmgr.toggle("server-down");
-          return console.log(it);
+          console.log(it);
+          new Promise(function(res, rej){});
+          return loader.off();
         });
       }
     };

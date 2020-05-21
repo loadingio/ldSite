@@ -213,6 +213,11 @@
           hint-fail.cancel!
           loader.cancel!
           ldcvmgr.toggle("server-down"); console.log it
+          # since server is down and we have handled it here,
+          # we simply return a promise that won't be resolved
+          # to stop further progress of current code.
+          new Promise (res, rej) ->
+          loader.off!
 
   auth.fetch {renew: false}
   action = do
