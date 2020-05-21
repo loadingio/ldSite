@@ -17,7 +17,7 @@ auth provides following APIs:
 
  * fetch(opt={renew: true}) - fetch user data, either from server or cookie.
    - cookie is stored in `global` variable. fetch will try getting data from cookie only if `renew` is `false`.
-   - if `renew` is `true`, fetch user data from `/js/global`
+   - if `renew` is `true`, fetch user data from `/d/global`
    - resolve `get` requests if necessary.
    - tips:
      - always renew if we need the latest user data from server.

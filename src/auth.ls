@@ -159,7 +159,7 @@
 
     # renew: set to true to force fetch data from server by ajax.
     fetch: (opt = {renew: true}) ->
-      # if js/global response later then 1000ms, popup a loader
+      # if d/global response later then 1000ms, popup a loader
       loader.on-later 1000
 
       # if it took too long to respond, just hint user about possibly server issue
@@ -180,7 +180,7 @@
           .0
       else null
       promise = if ret => Promise.resolve JSON.parse(decodeURIComponent(ret.1))
-      else ld$.fetch \/js/global, {}, {type: \json}
+      else ld$.fetch \/d/global, {}, {type: \json}
       promise
         .then ~>
           hint-fail.cancel!

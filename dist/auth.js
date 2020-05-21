@@ -323,7 +323,7 @@ var slice$ = [].slice;
         })[0] : null;
         promise = ret
           ? Promise.resolve(JSON.parse(decodeURIComponent(ret[1])))
-          : ld$.fetch('/js/global', {}, {
+          : ld$.fetch('/d/global', {}, {
             type: 'json'
           });
         return promise.then(function(it){
