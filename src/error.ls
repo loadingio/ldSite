@@ -2,6 +2,7 @@
   ldc.register \error, <[ldcvmgr]>, ({ldcvmgr}) ->
     http-code = do
       413: -> ldcvmgr.toggle('error-413')
+      404: -> ldcvmgr.toggle('error-404')
       403: -> ldcvmgr.toggle('error-403')
       400: -> ldcvmgr.toggle('error-400')
     ld-code = do

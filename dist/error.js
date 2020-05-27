@@ -7,6 +7,9 @@
       413: function(){
         return ldcvmgr.toggle('error-413');
       },
+      404: function(){
+        return ldcvmgr.toggle('error-404');
+      },
       403: function(){
         return ldcvmgr.toggle('error-403');
       },
