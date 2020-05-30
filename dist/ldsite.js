@@ -62,9 +62,10 @@ var slice$ = [].slice;
       authpanel = lc.authpanel = (that = dom)
         ? that
         : ld$.find(document, '.authpanel', 0);
-      if (!lc.authpanel) {
+      if (!lc.authpanel || lc.inited) {
         return;
       }
+      lc.inited = true;
       acts = ld$.find(authpanel, '[data-action]');
       authpanel.addEventListener('click', function(e){
         var n, act;
@@ -183,6 +184,17 @@ var slice$ = [].slice;
         }
         return results$;
       },
+      manuallyInit: function(opt){
+        var root;
+        opt == null && (opt = {});
+        if (!opt.root) {
+          return;
+        }
+        root = typeof opt.root === 'string'
+          ? document.querySelector(opt.root)
+          : opt.root;
+        return initAuthpanel(root);
+      },
       'switch': function(act){
         var p, this$ = this;
         if (!(act === 'signup' || act === 'login')) {
@@ -192,9 +204,12 @@ var slice$ = [].slice;
           ? ldcvmgr.getdom('authpanel')
           : Promise.resolve(lc.authpanel);
         return p.then(function(authpanel){
-          var x$;
+          var n, x$;
           initAuthpanel(authpanel);
-          x$ = ld$.find(authpanel, '.authpanel', 0).classList;
+          n = authpanel.classList.contains('authpanel')
+            ? authpanel
+            : ld$.find(authpanel, '.authpanel', 0);
+          x$ = n.classList;
           x$.remove('signup', 'login');
           x$.add(this$.act = act);
           return lc.form.check({

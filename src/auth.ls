@@ -27,7 +27,9 @@
 
   init-authpanel = (dom) ->
     authpanel = lc.authpanel = if dom => that else ld$.find document, \.authpanel, 0
-    if !lc.authpanel => return
+    if !lc.authpanel or lc.inited => return
+    lc.inited = true
+
 
     acts = ld$.find authpanel, '[data-action]'
     authpanel.addEventListener \click, (e) ->
@@ -91,12 +93,17 @@
     evt-handler: {}
     on: (n, cb) -> @evt-handler.[][n].push cb
     fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
+    manually-init: (opt = {}) ->
+      if !opt.root => return
+      root = if typeof(opt.root) == \string => document.querySelector(opt.root) else opt.root
+      init-authpanel root
     switch: (act) ->
       if !(act in <[signup login]>) => return
       p = if !lc.authpanel => ldcvmgr.getdom(\authpanel) else Promise.resolve(lc.authpanel)
       p.then (authpanel) ~>
         init-authpanel authpanel
-        ld$.find(authpanel,'.authpanel',0).classList
+        n = if authpanel.classList.contains \authpanel => authpanel else ld$.find(authpanel, '.authpanel', 0)
+        n.classList
           ..remove \signup, \login
           ..add @act = act
         lc.form.check {now: true}
