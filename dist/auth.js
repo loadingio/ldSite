@@ -35,7 +35,7 @@ var slice$ = [].slice;
           if ((user.config || (user.config = {})).legal || !user.key) {
             return;
           }
-          return ld$.fetch("/d/me/legal", {
+          return ld$.fetch(auth.api + "/me/legal", {
             method: 'POST'
           }).then(function(){
             return (user.config || (user.config = {})).legal = this$.val;
@@ -170,6 +170,24 @@ var slice$ = [].slice;
       }
     });
     auth = {
+      api: '/d',
+      init: function(opt){
+        var ref$, root;
+        opt == null && (opt = {});
+        if (opt.api) {
+          auth.api = opt.api;
+        }
+        if ((ref$ = auth.api)[ref$.length - 1] === '/') {
+          auth.api = auth.api.substring(0, auth.api.length - 1);
+        }
+        if (!opt.root) {
+          return;
+        }
+        root = typeof opt.root === 'string'
+          ? document.querySelector(opt.root)
+          : opt.root;
+        return initAuthpanel(root);
+      },
       evtHandler: {},
       on: function(n, cb){
         var ref$;
@@ -338,7 +356,7 @@ var slice$ = [].slice;
         })[0] : null;
         promise = ret
           ? Promise.resolve(JSON.parse(decodeURIComponent(ret[1])))
-          : ld$.fetch('/d/global', {}, {
+          : ld$.fetch(auth.api + "/global", {}, {
             type: 'json'
           });
         return promise.then(function(it){

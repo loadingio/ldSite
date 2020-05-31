@@ -16,7 +16,7 @@
       if user.{}config.legal and @dom => return @clear!
       if !(@val = util.cookie(\legal)) => return
       if ((user.{}config.legal) or !user.key) => return
-      ld$.fetch("/d/me/legal", {method: \POST}).then(~> user.{}config.legal = @val).catch(->)
+      ld$.fetch("#{auth.api}/me/legal", {method: \POST}).then(~> user.{}config.legal = @val).catch(->)
     init: ->
       if !@val and @dom => @dom.classList.remove \d-none else return
       <~ ld$.find(@dom, '[ld=ok]', 0).addEventListener \click, _
@@ -90,6 +90,14 @@
   # typical auth chek flow
   # get -> auth.show -> authpanel.show -> authpanel resolved -> ldc.auth.fetch -> get.resolved
   auth = do
+    api: '/d'
+    init: (opt={}) ->
+      if opt.api => auth.api = opt.api
+      if auth.api[* - 1] == \/ => auth.api = auth.api.substring(0, auth.api.length - 1)
+      if !opt.root => return
+      root = if typeof(opt.root) == \string => document.querySelector(opt.root) else opt.root
+      init-authpanel root
+
     evt-handler: {}
     on: (n, cb) -> @evt-handler.[][n].push cb
     fire: (n, ...v) -> for cb in (@evt-handler[n] or []) => cb.apply @, v
@@ -187,7 +195,7 @@
           .0
       else null
       promise = if ret => Promise.resolve JSON.parse(decodeURIComponent(ret.1))
-      else ld$.fetch \/d/global, {}, {type: \json}
+      else ld$.fetch "#{auth.api}/global", {}, {type: \json}
       promise
         .then ~>
           hint-fail.cancel!
