@@ -35,7 +35,7 @@ var slice$ = [].slice;
           if ((user.config || (user.config = {})).legal || !user.key) {
             return;
           }
-          return ld$.fetch(auth.api + "/me/legal", {
+          return ld$.fetch("/" + auth.api + "/me/legal", {
             method: 'POST'
           }).then(function(){
             return (user.config || (user.config = {})).legal = this$.val;
@@ -132,7 +132,9 @@ var slice$ = [].slice;
           }, ref$);
           body.passwd = body.passwd.replace(/\t*$/, '');
           body.recaptcha = recaptcha;
-          return ld$.fetch(auth.act === 'login' ? '/u/login' : '/u/signup', {
+          return ld$.fetch(auth.act === 'login'
+            ? "/" + auth.api + "/u/login"
+            : "/" + auth.api + "/u/signup", {
             method: 'POST',
             body: JSON.stringify(body),
             headers: {
@@ -170,7 +172,7 @@ var slice$ = [].slice;
       }
     });
     auth = {
-      api: '/d',
+      api: 'd',
       init: function(opt){
         var ref$, root;
         opt == null && (opt = {});
@@ -179,6 +181,9 @@ var slice$ = [].slice;
         }
         if ((ref$ = auth.api)[ref$.length - 1] === '/') {
           auth.api = auth.api.substring(0, auth.api.length - 1);
+        }
+        if (auth.api[0] === '/') {
+          auth.api = auth.api.substring(1);
         }
         if (!opt.root) {
           return;
@@ -356,7 +361,7 @@ var slice$ = [].slice;
         })[0] : null;
         promise = ret
           ? Promise.resolve(JSON.parse(decodeURIComponent(ret[1])))
-          : ld$.fetch(auth.api + "/global", {}, {
+          : ld$.fetch("/" + auth.api + "/global", {}, {
             type: 'json'
           });
         return promise.then(function(it){
