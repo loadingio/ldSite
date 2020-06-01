@@ -8,5 +8,6 @@ A typical `ldsite` core is like:
 
 where config can contain:
 
- * `api`: api root for accessing data with server. default "/d/" and can be overwritten to "/api/" or something like this, if necessary.
- * `ldcvmgrRoot`: root path where ldCover is stored. default "/modules/cover"
+ * api: api root for accessing data with server. default "/d/".
+ * ldcvmgrRoot: root path where ldCover is stored. default "/modules/cover"
+ * avatarUrl(key): a function returning url for avatar img of user `key`.

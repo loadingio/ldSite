@@ -1,5 +1,6 @@
 (->
-  ldc.register \navtop, <[auth]>, ({auth}) ->
+  ldc.register \navtop, <[ldsite auth]>, ({ldsite, auth}) ->
+    avatar-url = ldsite.avatar-url or (-> "/s/avatar/#{it}.png")
     lc = signed: false, pro: false, user: {}
     nav-check = (g) ->
       lc <<< signed: !!g.{}user.key, pro: g.{}user.plan, user: g.{}user
@@ -20,7 +21,7 @@
         signup: ({node}) -> node.classList.toggle \d-none, lc.signed
         "upgrade-now": ({node}) -> node.classList.toggle \d-none, lc.pro
         profile:  ({node}) -> node.classList.toggle \d-none, !lc.signed
-        avatar: ({node}) -> if lc.signed => node.style.backgroundImage = "url(/s/avatar/#{lc.user.key}.png)"
+        avatar: ({node}) -> if lc.signed => node.style.backgroundImage = "url(#{avatar-url(lc.user.key)})"
         plan: ({node}) ->
           node.innerText = if lc.pro => \PRO else \FREE
           node.classList.toggle \badge-primary, lc.pro
