@@ -8,4 +8,5 @@ A typical `ldsite` core is like:
 
 where config can contain:
 
- * `api`: api root for accessing data with server. it's default "/d/" and can be overwritten to "/api/" or something like this, if necessary.
+ * `api`: api root for accessing data with server. default "/d/" and can be overwritten to "/api/" or something like this, if necessary.
+ * `ldcvmgrRoot`: root path where ldCover is stored. default "/modules/cover"

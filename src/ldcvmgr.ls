@@ -1,5 +1,7 @@
 (->
-  <- ldc.register \ldcvmgr, [], _
+  ({ldsite}) <- ldc.register \ldcvmgr, <[ldsite]>, _
+  cover = (if ldsite and ldsite.ldcvmgr-root => that else "/modules/cover").replace(/\/$/,'')
+
   error = (n = '', e = {}) ->
     if n == \error => alert "something is wrong; please reload and try again"
     else ldcvmgr.toggle \error
@@ -14,7 +16,7 @@
       if @covers[n] => return Promise.resolve!
       if @workers[n] => return @prepare-proxy(n)
       @loader.on 1000
-      @workers[n] = fetch "/modules/cover/#n.html"
+      @workers[n] = fetch "#cover/#n.html"
         .then (v) ~>
           if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
           v.text!

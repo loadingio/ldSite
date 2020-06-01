@@ -34,7 +34,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
         if ((user.config || (user.config = {})).legal || !user.key) {
           return;
         }
-        return ld$.fetch("/" + auth.api + "/me/legal", {
+        return ld$.fetch(auth.api + "/me/legal", {
           method: 'POST'
         }).then(function(){
           return (user.config || (user.config = {})).legal = this$.val;
@@ -132,8 +132,8 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
         body.passwd = body.passwd.replace(/\t*$/, '');
         body.recaptcha = recaptcha;
         return ld$.fetch(auth.act === 'login'
-          ? "/" + auth.api + "/u/login"
-          : "/" + auth.api + "/u/signup", {
+          ? auth.api + "/u/login"
+          : auth.api + "/u/signup", {
           method: 'POST',
           body: JSON.stringify(body),
           headers: {
@@ -170,8 +170,9 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       return Promise.resolve(lc.global);
     }
   });
+  console.log(ldsite);
   auth = {
-    api: ldsite ? ldsite.api : 'd',
+    api: (ldsite ? ldsite.api : 'd').replace(/\/$/, ''),
     init: function(opt){
       var root;
       opt == null && (opt = {});
@@ -273,7 +274,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
     },
     logout: function(){
       loader.on();
-      return ld$.fetch('/u/logout', {
+      return ld$.fetch(auth.api + "/u/logout", {
         method: 'post'
       }, {}).then(function(){
         return auth.fetch({
@@ -351,7 +352,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       })[0] : null;
       promise = ret
         ? Promise.resolve(JSON.parse(decodeURIComponent(ret[1])))
-        : ld$.fetch("/" + auth.api + "/global", {}, {
+        : ld$.fetch(auth.api + "/global", {}, {
           type: 'json'
         });
       return promise.then(function(it){

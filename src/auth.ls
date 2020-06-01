@@ -14,7 +14,7 @@ consent = do
     if user.{}config.legal and @dom => return @clear!
     if !(@val = util.cookie(\legal)) => return
     if ((user.{}config.legal) or !user.key) => return
-    ld$.fetch("/#{auth.api}/me/legal", {method: \POST}).then(~> user.{}config.legal = @val).catch(->)
+    ld$.fetch("#{auth.api}/me/legal", {method: \POST}).then(~> user.{}config.legal = @val).catch(->)
   init: ->
     if !@val and @dom => @dom.classList.remove \d-none else return
     <~ ld$.find(@dom, '[ld=ok]', 0).addEventListener \click, _
@@ -63,7 +63,7 @@ init-authpanel = (dom) ->
         # try to remove all of them.
         body.passwd = body.passwd.replace(/\t*$/,'')
         body.recaptcha = recaptcha
-        ld$.fetch (if auth.act == \login => "/#{auth.api}/u/login" else "/#{auth.api}/u/signup"), {
+        ld$.fetch (if auth.act == \login => "#{auth.api}/u/login" else "#{auth.api}/u/signup"), {
           method: \POST
           body: JSON.stringify(body)
           headers: { 'Content-Type': 'application/json; charset=UTF-8' }
@@ -88,7 +88,7 @@ get = proxise -> if lc.global => return Promise.resolve lc.global
 # typical auth chek flow
 # get -> auth.show -> authpanel.show -> authpanel resolved -> ldc.auth.fetch -> get.resolved
 auth = do
-  api: if ldsite => ldsite.api else \d
+  api: (if ldsite => ldsite.api else \d).replace(/\/$/,'')
   init: (opt={}) ->
     if !opt.root => return
     root = if typeof(opt.root) == \string => document.querySelector(opt.root) else opt.root
@@ -136,7 +136,7 @@ auth = do
   google: -> @social \google
   logout: ->
     loader.on!
-    ld$.fetch \/u/logout, {method: \post}, {}
+    ld$.fetch "#{auth.api}/u/logout", {method: \post}, {}
       .then -> auth.fetch {renew: true}
       .then -> ldcvmgr.toggle \logout
       .then -> loader.off!
@@ -191,7 +191,7 @@ auth = do
         .0
     else null
     promise = if ret => Promise.resolve JSON.parse(decodeURIComponent(ret.1))
-    else ld$.fetch "/#{auth.api}/global", {}, {type: \json}
+    else ld$.fetch "#{auth.api}/global", {}, {type: \json}
     promise
       .then ~>
         hint-fail.cancel!
