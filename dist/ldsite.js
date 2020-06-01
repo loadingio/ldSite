@@ -170,7 +170,6 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       return Promise.resolve(lc.global);
     }
   });
-  console.log(ldsite);
   auth = {
     api: ldsite ? ldsite.api : 'd',
     init: function(opt){
@@ -350,7 +349,6 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       }).filter(function(it){
         return it;
       })[0] : null;
-      console.log(">", "/" + auth.api + "/global");
       promise = ret
         ? Promise.resolve(JSON.parse(decodeURIComponent(ret[1])))
         : ld$.fetch("/" + auth.api + "/global", {}, {
