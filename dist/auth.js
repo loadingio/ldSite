@@ -170,7 +170,6 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       return Promise.resolve(lc.global);
     }
   });
-  console.log(ldsite);
   auth = {
     api: (ldsite ? ldsite.api : 'd').replace(/\/$/, ''),
     init: function(opt){
