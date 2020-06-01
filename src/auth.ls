@@ -1,6 +1,5 @@
 (->
-
-  ({ldcvmgr,loader,util,error,recaptcha}) <- ldc.register \auth, <[ldcvmgr loader util error recaptcha]>, _
+  ({ldsite,ldcvmgr,loader,util,error,recaptcha}) <- ldc.register \auth, <[ldsite ldcvmgr loader util error recaptcha]>, _
 
   #prevent global object been altered accidentally
   global = -> if lc.global => JSON.parse(JSON.stringify lc.global) else null
@@ -90,11 +89,8 @@
   # typical auth chek flow
   # get -> auth.show -> authpanel.show -> authpanel resolved -> ldc.auth.fetch -> get.resolved
   auth = do
-    api: 'd'
+    api: if ldsite => ldsite.api else \d
     init: (opt={}) ->
-      if opt.api => auth.api = opt.api
-      if auth.api[* - 1] == \/ => auth.api = auth.api.substring(0, auth.api.length - 1)
-      if auth.api.0 == \/ => auth.api = auth.api.substring(1)
       if !opt.root => return
       root = if typeof(opt.root) == \string => document.querySelector(opt.root) else opt.root
       init-authpanel root

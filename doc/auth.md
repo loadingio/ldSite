@@ -15,6 +15,8 @@ take care of authpanel form, consent and provide authentication flow APIs. Need 
 
 auth provides following APIs:
 
+ * init(opt) - setup additional information with `opt`. currently opt only supports:
+   - root - authpanel root selector/DOM. this is for pages with static authpanel ( instead of a popup, auto-created one )
  * fetch(opt={renew: true}) - fetch user data, either from server or cookie.
    - cookie is stored in `global` variable. fetch will try getting data from cookie only if `renew` is `false`.
    - if `renew` is `true`, fetch user data from `/d/global`

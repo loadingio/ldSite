@@ -15,6 +15,8 @@ necessary frontend cores for a generic website, including:
    - URL parser
    - Cookie parser
 
+Additionally, you can config ldsite with an additional module `ldsite`.
+
 You can find corresponding documentation under `doc` folder.
 
 # Covers
