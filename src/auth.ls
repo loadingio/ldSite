@@ -171,7 +171,8 @@ auth = do
   # renew: set to true to force fetch data from server by ajax.
   fetch: (opt = {renew: true}) ->
     # if d/global response later then 1000ms, popup a loader
-    loader.on-later 1000
+    is-on = false
+    loader.on-later 1000 .then -> is-on := true
 
     # if it took too long to respond, just hint user about possibly server issue
     hint-fail = debounce(10000, ->
@@ -196,6 +197,7 @@ auth = do
       .then ~>
         hint-fail.cancel!
         loader.cancel!
+        if is-on => loader.off!
         ld$.fetch.{}headers['X-CSRF-Token'] = it.csrfToken
         lc.global = it
         lc.global.location = (if ip-from-taiwan? => (if ip-from-taiwan it.ip => \tw else \other) else undefined)

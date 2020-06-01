@@ -330,11 +330,14 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       });
     },
     fetch: function(opt){
-      var hintFail, ret, promise, this$ = this;
+      var isOn, hintFail, ret, promise, this$ = this;
       opt == null && (opt = {
         renew: true
       });
-      loader.onLater(1000);
+      isOn = false;
+      loader.onLater(1000).then(function(){
+        return isOn = true;
+      });
       hintFail = debounce(10000, function(){
         loader.off();
         return ldcvmgr.get('connection-timeout').then(function(){
@@ -358,6 +361,9 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
         var ref$, ret, e;
         hintFail.cancel();
         loader.cancel();
+        if (isOn) {
+          loader.off();
+        }
         ((ref$ = ld$.fetch).headers || (ref$.headers = {}))['X-CSRF-Token'] = it.csrfToken;
         lc.global = it;
         lc.global.location = typeof ipFromTaiwan != 'undefined' && ipFromTaiwan !== null ? ipFromTaiwan(it.ip) ? 'tw' : 'other' : undefined;
