@@ -405,7 +405,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
     }
   };
   auth.fetch({
-    renew: false
+    renew: true
   });
   action = {
     fb: function(){

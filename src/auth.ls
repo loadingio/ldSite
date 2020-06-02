@@ -232,7 +232,7 @@ auth = do
         new Promise (res, rej) ->
         loader.off!
 
-auth.fetch {renew: false}
+auth.fetch {renew: true}
 action = do
   fb: -> auth.social \facebook
   google: -> auth.social \google
