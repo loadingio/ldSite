@@ -8,6 +8,7 @@
     ld-code = do
       1004: -> ldcvmgr.toggle('assets-quota-exceeded')
       1005: -> ldcvmgr.toggle('csrftoken-mismatch')
+      1016: -> ldcvmgr.toggle('not-yet-available')
     ret = (opt = {}) -> (e) ->
       if e and e.json and e.json.name == \ldError =>
         code = e.json.id or e.json.code

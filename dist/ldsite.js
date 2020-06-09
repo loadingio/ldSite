@@ -493,6 +493,9 @@ function import$(obj, src){
       },
       1005: function(){
         return ldcvmgr.toggle('csrftoken-mismatch');
+      },
+      1016: function(){
+        return ldcvmgr.toggle('not-yet-available');
       }
     };
     ret = function(opt){
