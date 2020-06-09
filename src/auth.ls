@@ -118,7 +118,7 @@ auth = do
     @get!
       .then ({csrf-token}) ~>
         div.innerHTML = """
-        <form target="social-login" action="/u/auth/#name/" method="post">
+        <form target="social-login" action="#{auth.api}/u/auth/#name/" method="post">
           <input type="hidden" name="_csrf" value="#{csrf-token}"/>
         </form>"""
         window.social-login = login = proxise(-> ld$.find(div, 'form', 0).submit!)

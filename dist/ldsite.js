@@ -240,7 +240,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       return this.get().then(function(arg$){
         var csrfToken, login;
         csrfToken = arg$.csrfToken;
-        div.innerHTML = "<form target=\"social-login\" action=\"/u/auth/" + name + "/\" method=\"post\">\n  <input type=\"hidden\" name=\"_csrf\" value=\"" + csrfToken + "\"/>\n</form>";
+        div.innerHTML = "<form target=\"social-login\" action=\"" + auth.api + "/u/auth/" + name + "/\" method=\"post\">\n  <input type=\"hidden\" name=\"_csrf\" value=\"" + csrfToken + "\"/>\n</form>";
         window.socialLogin = login = proxise(function(){
           return ld$.find(div, 'form', 0).submit();
         });
