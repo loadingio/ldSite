@@ -257,7 +257,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
         if (!ldcvmgr.isOn('authpanel')) {
           return window.location.reload();
         }
-        lda.auth.hide();
+        lda.auth.hide('ok');
         return auth.fire("auth.signin");
       })['finally'](function(){
         return ld$.remove(div);
@@ -305,7 +305,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
             if (!(g && (g.user || (g.user = {})).key)) {
               return Promise.reject(new ldError(1000));
             }
-            lda.auth.hide();
+            lda.auth.hide('ok');
             return g;
           });
         } else {

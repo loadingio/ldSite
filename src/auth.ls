@@ -127,7 +127,7 @@ auth = do
       .then ({user}) -> if !(user and user.key) => Promise.reject new ldError(1000)
       .then ->
         if !ldcvmgr.is-on(\authpanel) => return window.location.reload!
-        lda.auth.hide!
+        lda.auth.hide \ok
         auth.fire("auth.signin")
       .finally -> ld$.remove div
       .catch error {ignore: [999 1000]}
@@ -153,7 +153,7 @@ auth = do
         p = if !(g and g.{}user.key) => lda.auth.show(opt.tab, opt.info) else Promise.resolve(g)
         p.then (g) ->
           if !(g and g.{}user.key) => return Promise.reject(new ldError(1000))
-          lda.auth.hide!
+          lda.auth.hide \ok
           return g
       else return g
 
@@ -239,7 +239,7 @@ action = do
   logout: -> auth.logout!
   is-on: -> ldcvmgr.is-on \authpanel
   show: (n = \signup, info = \default) ->
-   Promise.resolve(ldcvmgr.is-on \authpanel)
+    Promise.resolve(ldcvmgr.is-on \authpanel)
       .then -> if !it => auth.switch n
       .then -> if info => action.info info
       .then -> ldcvmgr.get \authpanel
