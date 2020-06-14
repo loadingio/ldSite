@@ -23,7 +23,7 @@
       workers: {},
       prepareProxy: proxise(function(n){}),
       prepare: function(n){
-        var this$ = this;
+        var p, that, this$ = this;
         if (this.covers[n]) {
           return Promise.resolve();
         }
@@ -31,27 +31,31 @@
           return this.prepareProxy(n);
         }
         this.loader.on(1000);
-        return this.workers[n] = fetch(cover + "/" + n + ".html").then(function(v){
-          if (!(v && v.ok)) {
-            throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
-          }
-          return v.text();
-        }).then(function(it){
-          var div, root;
-          document.body.appendChild(div = document.createElement("div"));
-          div.innerHTML = it;
-          ld$.find(div, 'script').map(function(it){
-            var script;
-            script = ld$.create({
-              name: 'script',
-              attr: {
-                type: 'text/javascript'
-              }
+        p = (that = document.querySelector(".ldcvmgr[data-name=" + n + "]"))
+          ? Promise.resolve(that)
+          : this.workers[n] = fetch(cover + "/" + n + ".html").then(function(v){
+            if (!(v && v.ok)) {
+              throw new Error("modal '" + (!n ? '<no-name>' : n) + "' load failed.");
+            }
+            return v.text();
+          }).then(function(it){
+            var div, root;
+            document.body.appendChild(div = document.createElement("div"));
+            div.innerHTML = it;
+            ld$.find(div, 'script').map(function(it){
+              var script;
+              script = ld$.create({
+                name: 'script',
+                attr: {
+                  type: 'text/javascript'
+                }
+              });
+              script.text = it.textContent;
+              return it.parentNode.replaceChild(script, it);
             });
-            script.text = it.textContent;
-            return it.parentNode.replaceChild(script, it);
+            return root = div.querySelector('.ldcv');
           });
-          root = div.querySelector('.ldcv');
+        return p.then(function(root){
           this$.covers[n] = new ldCover({
             root: root,
             lock: root.getAttribute('data-lock') === 'true'

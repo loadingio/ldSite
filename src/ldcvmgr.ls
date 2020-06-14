@@ -16,18 +16,22 @@
       if @covers[n] => return Promise.resolve!
       if @workers[n] => return @prepare-proxy(n)
       @loader.on 1000
-      @workers[n] = fetch "#cover/#n.html"
-        .then (v) ~>
-          if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
-          v.text!
-        .then ~>
-          document.body.appendChild (div = document.createElement("div"))
-          div.innerHTML = it
-          ld$.find(div,\script).map ->
-            script = ld$.create name: \script, attr: type: \text/javascript
-            script.text = it.textContent
-            it.parentNode.replaceChild script, it
-          root = div.querySelector('.ldcv')
+      p = if document.querySelector(".ldcvmgr[data-name=#n]") => Promise.resolve(that)
+      else
+        @workers[n] = fetch "#cover/#n.html"
+          .then (v) ~>
+            if !(v and v.ok) => throw new Error("modal '#{if !n => '<no-name>' else n}' load failed.")
+            v.text!
+          .then ~>
+            document.body.appendChild (div = document.createElement("div"))
+            div.innerHTML = it
+            ld$.find(div,\script).map ->
+              script = ld$.create name: \script, attr: type: \text/javascript
+              script.text = it.textContent
+              it.parentNode.replaceChild script, it
+            root = div.querySelector('.ldcv')
+      p
+        .then (root) ~>
           @covers[n] = new ldCover root: root, lock: root.getAttribute(\data-lock) == \true
           ldcvmgr.prepare-proxy.resolve!
           delete @workers[n]
