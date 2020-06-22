@@ -26,6 +26,9 @@
       },
       1016: function(){
         return ldcvmgr.toggle('not-yet-available');
+      },
+      1018: function(){
+        return ldcvmgr.toggle('consent-required');
       }
     };
     ret = function(opt){

@@ -437,8 +437,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
       opt == null && (opt = {});
       type = opt.type || 'tos';
       cfg = (ldsite.consent || (ldsite.consent = {}))[type];
-      cover = cfg ? cfg.cover || 'tos-consent' : '';
-      console.log(">>", opt);
+      cover = cfg ? cfg.cover || 'consent' : '';
       return Promise.resolve().then(function(){
         if (!cfg) {
           return;
@@ -450,21 +449,32 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error', 'recaptcha
           }
           time = ((ref$ = (ref1$ = g.user).config || (ref1$.config = {})).consent || (ref$.consent = {}))[type] || auth.consentTime[type] || 0;
           p = !opt.bypass && ((opt.force && Date.now() - time > 10000) || !time || time < (cfg.time || 0))
-            ? ldcvmgr.getdom(cover).then(function(dom){
-              var that;
-              if (that = ld$.find(dom, 'object', 0)) {
-                that.setAttribute('data', cfg.url);
-              }
-              if (that = ld$.find(dom, 'embed', 0)) {
-                that.setAttribute('src', cfg.url);
-              }
-              return ldcvmgr.get(cover);
-            }).then(function(it){
-              if (!it) {
-                return Promise.reject(new ldError(1018));
-              }
-            })
-            : Promise.resolve();
+            ? cfg.prompt
+              ? cfg.prompt()
+              : ldcvmgr.getdom(cover).then(function(dom){
+                var iframe, object, that;
+                if (cfg.type === 'link') {
+                  iframe = ld$.find(dom, 'iframe', 0);
+                  iframe.classList.remove('d-none');
+                  iframe.setAttribute('src', cfg.url);
+                } else {
+                  object = ld$.find(dom, 'object', 0);
+                  object.classList.remove('d-none');
+                  if (that = object) {
+                    that.setAttribute('data', cfg.url);
+                  }
+                  if (that = ld$.find(dom, 'embed', 0)) {
+                    that.setAttribute('src', cfg.url);
+                  }
+                }
+                return ldcvmgr.get(cover);
+              })
+            : Promise.resolve(true);
+          p = p.then(function(it){
+            if (!it) {
+              return Promise.reject(new ldError(1018));
+            }
+          });
           if (g.user.key && !((ref$ = (ref1$ = g.user).config || (ref1$.config = {})).consent || (ref$.consent = {}))[type]) {
             return p.then(function(){
               var json;
@@ -590,6 +600,9 @@ function in$(x, xs){
       },
       1016: function(){
         return ldcvmgr.toggle('not-yet-available');
+      },
+      1018: function(){
+        return ldcvmgr.toggle('consent-required');
       }
     };
     ret = function(opt){

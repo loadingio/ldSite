@@ -257,8 +257,7 @@ auth = do
   consent: (opt = {}) ->
     type = opt.type or \tos
     cfg = ldsite.{}consent[type]
-    cover = if cfg => cfg.cover or \tos-consent else ''
-    console.log ">>", opt
+    cover = if cfg => cfg.cover or \consent else ''
     Promise.resolve!
       .then ->
         if !cfg => return
@@ -272,15 +271,25 @@ auth = do
             # g.user.config.consent might be undefined due to the account is just created
             p = if !opt.bypass and
             ((opt.force and (Date.now! - time) > 10000) or !time or time < (cfg.time or 0)) =>
-              ldcvmgr.getdom cover
-                .then (dom) ->
-                  # TODO we should also make this configurable
-                  if ld$.find(dom, 'object', 0) => that.setAttribute(\data, cfg.url)
-                  if ld$.find(dom, 'embed', 0) => that.setAttribute(\src, cfg.url)
-                  ldcvmgr.get cover
-                .then -> if !it => return Promise.reject new ldError(1018)
-            else Promise.resolve!
+              if cfg.prompt => cfg.prompt!
+              else
+                ldcvmgr.getdom cover
+                  .then (dom) ->
+                    # TODO we should also make this configurable
+                    if cfg.type == \link =>
+                      iframe = ld$.find(dom, 'iframe', 0)
+                      iframe.classList.remove \d-none
+                      iframe.setAttribute \src, cfg.url
+                    else
+                      object = ld$.find(dom, 'object', 0)
+                      object.classList.remove \d-none
+                      if object => that.setAttribute(\data, cfg.url)
+                      if ld$.find(dom, 'embed', 0) => that.setAttribute(\src, cfg.url)
 
+                    ldcvmgr.get cover
+            else Promise.resolve true
+
+            p = p.then -> if !it => return Promise.reject new ldError(1018)
             # if user exists and consent time is empty, we should update the consent time
             if g.user.key and !g.user.{}config.{}consent[type] =>
               p
