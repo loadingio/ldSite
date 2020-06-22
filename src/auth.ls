@@ -5,23 +5,30 @@ global = -> if lc.global => JSON.parse(JSON.stringify lc.global) else null
 [lc,el] = [{}, {}]
 
 # cookie consent
-consent = do
+cookie-consent = do
   dom: ld$.find document, '[ld-scope=cookie-consent]', 0
-  val: util.cookie(\legal)
+  val: util.cookie(\consent.cookie)
   clear: -> if @dom => ld$.remove(@dom); @dom = null
   check: ->
     ({user}) <~ auth.get!then _
-    if user.{}config.legal and @dom => return @clear!
-    if !(@val = util.cookie(\legal)) => return
-    if ((user.{}config.legal) or !user.key) => return
-    ld$.fetch("#{auth.api}/me/legal", {method: \POST}).then(~> user.{}config.legal = @val).catch(->)
+    if user.{}config.{}consent.cookie and @dom => return @clear!
+    if !(@val = util.cookie(\consent.cookie)) => return
+    if ((user.{}config.{}consent.cookie) or !user.key) => return
+    ld$.fetch("#{auth.api}/me/config", {method: \POST}, {json: {type: \consent, name: <[cookie]>}})
+      .then (ret = {}) ~>
+        user.{}config <<< ret
+        util.cookie(
+          \consent.cookie
+          (ret.{}config.{}consent.cookie or Date.now!)
+          new Date(Date.now() + 86400000 * 365 * 100).toGMTString()
+        )
+      .catch(->)
   init: ->
     if !@val and @dom => @dom.classList.remove \d-none else return
     <~ ld$.find(@dom, '[ld=ok]', 0).addEventListener \click, _
-    util.cookie \legal, (new Date!getTime!), new Date(Date.now() + 86400000 * 365 * 100).toGMTString()
     @clear!
     @check!
-consent.init!
+cookie-consent.init!
 
 init-authpanel = (dom) ->
   authpanel = lc.authpanel = if dom => that else ld$.find document, \.authpanel, 0
@@ -55,14 +62,16 @@ init-authpanel = (dom) ->
   submit = ->
     if !form.ready! => return
     ldld.on!
+    val = form.values!
+    body = {} <<< val{email, passwd, displayname} <<< {config: {newsletter: val.newsletter}}
+    body.passwd = body.passwd.replace(/\t*$/,'')
     recaptcha.get \signin
       .then (recaptcha) ->
-        val = form.values!
-        body = {} <<< val{email, passwd, displayname} <<< {config: {newsletter: val.newsletter}}
         # dunno why but some users have a literal tab in its password field, which cause problem here.
         # try to remove all of them.
-        body.passwd = body.passwd.replace(/\t*$/,'')
         body.recaptcha = recaptcha
+      .then -> auth.consent {timing: \signin}
+      .then ->
         ld$.fetch (if auth.act == \login => "#{auth.api}/u/login" else "#{auth.api}/u/signup"), {
           method: \POST
           body: JSON.stringify(body)
@@ -75,7 +84,8 @@ init-authpanel = (dom) ->
         if g.user => lda.auth.hide \ok
         form.reset!
         ldld.off!
-        auth.fire("auth.signin")
+      .then -> auth.consent {timing: \signin, bypass: true}
+      .then -> auth.fire("auth.signin")
       .catch ->
         action.info \failed
         form.fields.passwd.value = null
@@ -116,6 +126,7 @@ auth = do
     div = ld$.create name: \div
     document.body.appendChild div
     @get!
+      .then -> auth.consent {timing: \signin}
       .then ({csrf-token}) ~>
         div.innerHTML = """
         <form target="social-login" action="#{auth.api}/u/auth/#name/" method="post">
@@ -128,7 +139,8 @@ auth = do
       .then ->
         if !ldcvmgr.is-on(\authpanel) => return window.location.reload!
         lda.auth.hide \ok
-        auth.fire("auth.signin")
+      .then -> auth.consent {timing: \signin, bypass: true}
+      .then -> auth.fire("auth.signin")
       .finally -> ld$.remove div
       .catch error {ignore: [999 1000]}
 
@@ -205,7 +217,7 @@ auth = do
         get.resolve ret
         try
           ldc.fire \auth.change, ret
-          consent.check!
+          cookie-consent.check!
           /* ga code { */
           if gtag? =>
             if !gtag.userid and ret.user and ret.user.key =>
@@ -231,6 +243,54 @@ auth = do
         # to stop further progress of current code.
         new Promise (res, rej) ->
         loader.off!
+  # config:
+  #   ldsite.consent[type]:
+  #     timing: <[ ... ]> ( e.g., signin )
+  #     url: .... ( pdf url )
+  #     cover: cover name for user to review and agree
+  # option:
+  #   type: what kind of consent is it? default tos
+  #   force: should we force popup consent cover? default false
+  #   timing: timing of this invocation.
+  #   bypass: true to bypass modal and update user object directly. should ONLY be used after user creation.
+  consent-time: {}
+  consent: (opt = {}) ->
+    type = opt.type or \tos
+    cfg = ldsite.{}consent[type]
+    cover = if cfg => cfg.cover or \tos-consent else ''
+    console.log ">>", opt
+    Promise.resolve!
+      .then ->
+        if !cfg => return
+        auth.fetch!
+          .then (g) ->
+            if !opt.force and opt.timing and !(opt.timing in cfg.timing) => return
+            time = g.user.{}config.{}consent[type] or auth.consent-time[type] or 0
+            # > 10000 => sometimes we might have signin(consent) -> action(consent again) flow
+            # so we expect two consent to be shown if they are not too close to each other.
+            # additionally, we use auth.consent-time because
+            # g.user.config.consent might be undefined due to the account is just created
+            p = if !opt.bypass and
+            ((opt.force and (Date.now! - time) > 10000) or !time or time < (cfg.time or 0)) =>
+              ldcvmgr.getdom cover
+                .then (dom) ->
+                  # TODO we should also make this configurable
+                  if ld$.find(dom, 'object', 0) => that.setAttribute(\data, cfg.url)
+                  if ld$.find(dom, 'embed', 0) => that.setAttribute(\src, cfg.url)
+                  ldcvmgr.get cover
+                .then -> if !it => return Promise.reject new ldError(1018)
+            else Promise.resolve!
+
+            # if user exists and consent time is empty, we should update the consent time
+            if g.user.key and !g.user.{}config.{}consent[type] =>
+              p
+                .then ->
+                  auth.consent-time[type] = Date.now!
+                  json = type: \consent, name: [type]
+                  ld$.fetch("#{auth.api}/me/config", {method: \POST}, {json, type: \json})
+                    .catch(->console.log ">", it) # user account not available yet. silent fail
+                .then (ret = {}) ~> g.user.{}config <<< ret
+            else p
 
 auth.fetch {renew: true}
 action = do
