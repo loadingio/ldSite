@@ -1,8 +1,37 @@
-({ldsite,ldcvmgr,loader,util,error,recaptcha}) <- ldc.register \auth, <[ldsite ldcvmgr loader util error recaptcha]>, _
+({ldsite,ldcvmgr,loader,util,error}) <- ldc.register \auth, <[ldsite ldcvmgr loader util error]>, _
 
 #prevent global object been altered accidentally
 global = -> if lc.global => JSON.parse(JSON.stringify lc.global) else null
 [lc,el] = [{}, {}]
+
+recaptcha = do
+  lc: ready: false, queue: [], tag: null, sitekey: null, global: null, enabled: true, inited: false
+  init: ->
+    if @lc.inited => return Promise.resolve!
+    auth.get!
+      .then (g) ~> @lc <<< {global: g, sitekey: g.{}recaptcha.sitekey, enabled: g.{}recaptcha.enabled}
+      .then ~>
+        if !(@lc.enabled and @lc.sitekey) or @lc.tag => return
+        @lc.tag = tag = document.createElement("script")
+        tag.onload = ~>
+          <~ grecaptcha.ready _
+          @lc.ready = true
+          @lc.queue.map -> it.res!
+          @lc.queue.splice 0
+        tag.setAttribute \type, "text/javascript"
+        tag.setAttribute \src, "https://www.google.com/recaptcha/api.js?render=#{@lc.sitekey}"
+        document.body.appendChild tag
+      .then ~> @lc.inited = true
+  get: (action = \generic) ->
+    @init!
+      .then ~>
+        if !(@lc.sitekey and @lc.enabled) => return Promise.resolve('')
+        p = if @lc.ready => Promise.resolve! else new Promise (res, rej) ~> @lc.queue.push {res, rej}
+        p
+          .then ~>
+            grecaptcha.execute @lc.sitekey, {action}
+          .then (token) -> return token
+
 
 # cookie consent
 cookie-consent = do
@@ -243,16 +272,7 @@ auth = do
         # to stop further progress of current code.
         new Promise (res, rej) ->
         loader.off!
-  # config:
-  #   ldsite.consent[type]:
-  #     timing: <[ ... ]> ( e.g., signin )
-  #     url: .... ( pdf url )
-  #     cover: cover name for user to review and agree
-  # option:
-  #   type: what kind of consent is it? default tos
-  #   force: should we force popup consent cover? default false
-  #   timing: timing of this invocation.
-  #   bypass: true to bypass modal and update user object directly. should ONLY be used after user creation.
+
   consent-time: {}
   consent: (opt = {}) ->
     type = opt.type or \tos
@@ -300,8 +320,11 @@ auth = do
                     .catch(->console.log ">", it) # user account not available yet. silent fail
                 .then (ret = {}) ~> g.user.{}config <<< ret
             else p
+  recaptcha: recaptcha
 
 auth.fetch {renew: true}
+  .then -> recaptcha.init!
+
 action = do
   fb: -> auth.social \facebook
   google: -> auth.social \google

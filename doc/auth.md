@@ -63,6 +63,25 @@ auth provides following APIs:
    - `auth.signin`
    - `aith.change`
 
+ * recaptcha: recaptcha submodule. with following methods:
+   - init - initialization of recaptcha submodule. user usually won't need this.
+   - get - get token required for recaptcah.
+     - resolve to '' if recaptcha not enabled.
+     - automatically initialize if not yet initialized.
+
+ * consent: (opt = {}): ask user for consent.
+   - config:
+     - ldsite.consent[type]:
+       - timing: <[ ... ]> ( e.g., signin )
+       - url: .... ( pdf url )
+       - cover: cover name for user to review and agree
+   - opt:
+     - type: what kind of consent is it? default tos
+     - force: should we force popup consent cover? default false
+     - timing: timing of this invocation.
+     - bypass: true to bypass modal and update user object directly. should ONLY be used after user creation.
+
+
 ## Actions
 
 As methods in `lda.auth` object:
