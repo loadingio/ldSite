@@ -18,6 +18,9 @@
       }
     };
     ldCode = {
+      1000: function(){
+        return ldcvmgr.toggle('auth-required');
+      },
       1004: function(){
         return ldcvmgr.toggle('assets-quota-exceeded');
       },

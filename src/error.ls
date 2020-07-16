@@ -6,6 +6,7 @@
       403: -> ldcvmgr.toggle('error-403')
       400: -> ldcvmgr.toggle('error-400')
     ld-code = do
+      1000: -> ldcvmgr.toggle('auth-required')
       1004: -> ldcvmgr.toggle('assets-quota-exceeded')
       1005: -> ldcvmgr.toggle('csrftoken-mismatch')
       1016: -> ldcvmgr.toggle('not-yet-available')
