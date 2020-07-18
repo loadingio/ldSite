@@ -40,6 +40,7 @@ auth provides following APIs:
      - authed: authpanel will be shown if user isn't logged in when true 
      - info: information shown in authpanel if panel is shown.
      - tab: either `signup` or `login`. indicate the default tab to toggle when authpanel is shown.
+     - forceEmail: default null. When provided, force setting the email field to desired value, make it read-only.
    - expected fields in returned object:
      - location - 'tw' or other for now.
      - ip - user IP address.
