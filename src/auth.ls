@@ -191,7 +191,7 @@ auth = do
   get: (opt = {authed: false}) ->
     get!then (g) ->
       if opt.authed =>
-        p = if !(g and g.{}user.key) => lda.auth.show(opt.tab, opt.info) else Promise.resolve(g)
+        p = if !(g and g.{}user.key) => lda.auth.show(opt.tab, opt.info, opt) else Promise.resolve(g)
         p.then (g) ->
           if !(g and g.{}user.key) => return Promise.reject(new ldError(1000))
           lda.auth.hide \ok
@@ -330,10 +330,17 @@ action = do
   google: -> auth.social \google
   logout: -> auth.logout!
   is-on: -> ldcvmgr.is-on \authpanel
-  show: (n = \signup, info = \default) ->
+  show: (n = \signup, info = \default, opt = {}) ->
     Promise.resolve(ldcvmgr.is-on \authpanel)
       .then -> if !it => auth.switch n
       .then -> if info => action.info info
+      .then ->
+        email = lc.form.getFields!email
+        if opt.force-email =>
+          email.setAttribute \readonly, true
+          email.value = opt.force-email
+          lc.form.check {n: \email, now: true}
+        else email.setAttribute \readonly, false
       .then -> ldcvmgr.get \authpanel
       .then -> if it => auth.fetch! # re-fetch only if get return sth.
   hide: (obj = null) -> ldcvmgr.set \authpanel, obj # default hide set with nothing to indicate a cancel.

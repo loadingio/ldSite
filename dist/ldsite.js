@@ -393,7 +393,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
         var p;
         if (opt.authed) {
           p = !(g && (g.user || (g.user = {})).key)
-            ? lda.auth.show(opt.tab, opt.info)
+            ? lda.auth.show(opt.tab, opt.info, opt)
             : Promise.resolve(g);
           return p.then(function(g){
             if (!(g && (g.user || (g.user = {})).key)) {
@@ -588,9 +588,10 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
     isOn: function(){
       return ldcvmgr.isOn('authpanel');
     },
-    show: function(n, info){
+    show: function(n, info, opt){
       n == null && (n = 'signup');
       info == null && (info = 'default');
+      opt == null && (opt = {});
       return Promise.resolve(ldcvmgr.isOn('authpanel')).then(function(it){
         if (!it) {
           return auth['switch'](n);
@@ -598,6 +599,19 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
       }).then(function(){
         if (info) {
           return action.info(info);
+        }
+      }).then(function(){
+        var email;
+        email = lc.form.getFields().email;
+        if (opt.forceEmail) {
+          email.setAttribute('readonly', true);
+          email.value = opt.forceEmail;
+          return lc.form.check({
+            n: 'email',
+            now: true
+          });
+        } else {
+          return email.setAttribute('readonly', false);
         }
       }).then(function(){
         return ldcvmgr.get('authpanel');
