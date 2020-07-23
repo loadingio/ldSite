@@ -321,14 +321,16 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
         name: 'div'
       });
       document.body.appendChild(div);
-      return this.get().then(function(){
+      return this.get().then(function(arg$){
+        var csrfToken;
+        csrfToken = arg$.csrfToken;
+        return div.innerHTML = "<form target=\"social-login\" action=\"" + auth.api + "/u/auth/" + name + "/\" method=\"post\">\n  <input type=\"hidden\" name=\"_csrf\" value=\"" + csrfToken + "\"/>\n</form>";
+      }).then(function(){
         return auth.consent({
           timing: 'signin'
         });
-      }).then(function(arg$){
-        var csrfToken, login;
-        csrfToken = arg$.csrfToken;
-        div.innerHTML = "<form target=\"social-login\" action=\"" + auth.api + "/u/auth/" + name + "/\" method=\"post\">\n  <input type=\"hidden\" name=\"_csrf\" value=\"" + csrfToken + "\"/>\n</form>";
+      }).then(function(){
+        var login;
         window.socialLogin = login = proxise(function(){
           return ld$.find(div, 'form', 0).submit();
         });
@@ -611,7 +613,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
             now: true
           });
         } else {
-          return email.setAttribute('readonly', false);
+          return email.removeAttribute('readonly');
         }
       }).then(function(){
         return ldcvmgr.get('authpanel');

@@ -155,12 +155,13 @@ auth = do
     div = ld$.create name: \div
     document.body.appendChild div
     @get!
-      .then -> auth.consent {timing: \signin}
       .then ({csrf-token}) ~>
         div.innerHTML = """
         <form target="social-login" action="#{auth.api}/u/auth/#name/" method="post">
           <input type="hidden" name="_csrf" value="#{csrf-token}"/>
         </form>"""
+      .then -> auth.consent {timing: \signin}
+      .then ->
         window.social-login = login = proxise(-> ld$.find(div, 'form', 0).submit!)
         login!
       .then ~> @fetch!
@@ -340,7 +341,7 @@ action = do
           email.setAttribute \readonly, true
           email.value = opt.force-email
           lc.form.check {n: \email, now: true}
-        else email.setAttribute \readonly, false
+        else email.removeAttribute \readonly
       .then -> ldcvmgr.get \authpanel
       .then -> if it => auth.fetch! # re-fetch only if get return sth.
   hide: (obj = null) -> ldcvmgr.set \authpanel, obj # default hide set with nothing to indicate a cancel.
