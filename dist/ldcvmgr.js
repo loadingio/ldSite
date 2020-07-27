@@ -64,7 +64,7 @@
           delete this$.workers[n];
           return debounce(1);
         })['finally'](function(){
-          return this$.loader.cancel();
+          return this$.loader.cancel(false);
         })['catch'](function(it){
           throw it;
         });

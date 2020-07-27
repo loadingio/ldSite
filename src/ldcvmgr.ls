@@ -36,7 +36,7 @@
           ldcvmgr.prepare-proxy.resolve!
           delete @workers[n]
           debounce 1
-        .finally ~> @loader.cancel!
+        .finally ~> @loader.cancel false
         .catch ~> throw it
     purge: (n) -> if n? => delete @covers[n] else @covers = {}
     lock: (n, p) ->
