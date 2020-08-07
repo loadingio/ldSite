@@ -315,22 +315,21 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
       });
     },
     social: function(name){
-      var des, div, this$ = this;
-      des = window.open('', 'social-login', 'height=640,width=560');
-      div = ld$.create({
-        name: 'div'
-      });
-      document.body.appendChild(div);
-      return this.get().then(function(arg$){
-        var csrfToken;
+      var div, this$ = this;
+      div = null;
+      return auth.consent({
+        timing: 'signin'
+      }).then(function(){
+        return this$.get();
+      }).then(function(arg$){
+        var csrfToken, des, login;
         csrfToken = arg$.csrfToken;
-        return div.innerHTML = "<form target=\"social-login\" action=\"" + auth.api + "/u/auth/" + name + "/\" method=\"post\">\n  <input type=\"hidden\" name=\"_csrf\" value=\"" + csrfToken + "\"/>\n</form>";
-      }).then(function(){
-        return auth.consent({
-          timing: 'signin'
+        des = window.open('', 'social-login', 'height=640,width=560');
+        div = ld$.create({
+          name: 'div'
         });
-      }).then(function(){
-        var login;
+        div.innerHTML = "<form target=\"social-login\" action=\"" + auth.api + "/u/auth/" + name + "/\" method=\"post\">\n  <input type=\"hidden\" name=\"_csrf\" value=\"" + csrfToken + "\"/>\n</form>";
+        document.body.appendChild(div);
         window.socialLogin = login = proxise(function(){
           return ld$.find(div, 'form', 0).submit();
         });
@@ -356,7 +355,9 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
       }).then(function(){
         return auth.fire("auth.signin");
       })['finally'](function(){
-        return ld$.remove(div);
+        if (div) {
+          return ld$.remove(div);
+        }
       })['catch'](error({
         ignore: [999, 1000]
       }));

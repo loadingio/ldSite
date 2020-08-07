@@ -151,17 +151,17 @@ auth = do
         ..add @act = act
       lc.form.check {now: true}
   social: (name) ->
-    des = window.open '', 'social-login', 'height=640,width=560'
-    div = ld$.create name: \div
-    document.body.appendChild div
-    @get!
+    div = null
+    auth.consent {timing: \signin}
+      .then ~> @get!
       .then ({csrf-token}) ~>
+        des = window.open '', 'social-login', 'height=640,width=560'
+        div := ld$.create name: \div
         div.innerHTML = """
         <form target="social-login" action="#{auth.api}/u/auth/#name/" method="post">
           <input type="hidden" name="_csrf" value="#{csrf-token}"/>
         </form>"""
-      .then -> auth.consent {timing: \signin}
-      .then ->
+        document.body.appendChild div
         window.social-login = login = proxise(-> ld$.find(div, 'form', 0).submit!)
         login!
       .then ~> @fetch!
@@ -171,7 +171,7 @@ auth = do
         lda.auth.hide \ok
       .then -> auth.consent {timing: \signin, bypass: true}
       .then -> auth.fire("auth.signin")
-      .finally -> ld$.remove div
+      .finally -> if div => ld$.remove div
       .catch error {ignore: [999 1000]}
 
   fb: -> @social \facebook
@@ -312,6 +312,7 @@ auth = do
 
             p = p.then -> if !it => return Promise.reject new ldError(1018)
             # if user exists and consent time is empty, we should update the consent time
+            # TODO: if consent is prompted before user sign in/up ?
             if g.user.key and !g.user.{}config.{}consent[type] =>
               p
                 .then ->
