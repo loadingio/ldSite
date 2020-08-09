@@ -156,7 +156,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
           s.email = 2;
         }
         if (s.passwd !== 1) {
-          if (auth.act === 'signup' && (f.passwd.value + "").length < 8) {
+          if (auth.act !== 'login' && (f.passwd.value + "").length < 8) {
             s.passwd = 2;
           } else {
             s.passwd = !f.passwd.value ? 1 : 0;
