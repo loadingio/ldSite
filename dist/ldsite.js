@@ -239,7 +239,11 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
       }).then(function(){
         return auth.fire("auth.signin");
       })['catch'](function(){
-        action.info('failed');
+        if (auth.act === 'signup') {
+          action.info('signup-failed');
+        } else {
+          action.info('failed');
+        }
         form.fields.passwd.value = null;
         form.check({
           n: 'passwd',

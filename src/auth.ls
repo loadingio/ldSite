@@ -116,7 +116,8 @@ init-authpanel = (dom) ->
       .then -> auth.consent {timing: \signin, bypass: true}
       .then -> auth.fire("auth.signin")
       .catch ->
-        action.info \failed
+        if auth.act == \signup => action.info \signup-failed
+        else action.info \failed
         form.fields.passwd.value = null
         form.check {n: \passwd, now: true}
         ldld.off!
