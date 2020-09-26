@@ -77,8 +77,9 @@ init-authpanel = (dom) ->
     after-check: (s, f) ->
       if s.email != 1 and !/^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.[a-z]{2,}|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i.exec(f.email.value) => s.email = 2
       if s.passwd != 1 =>
-        if auth.act != \login and "#{f.passwd.value}".length < 8 => s.passwd = 2
-        else s.passwd = if !f.passwd.value => 1 else 0
+        #if auth.act != \login and "#{f.passwd.value}".length < 8 => s.passwd = 2
+        #else s.passwd = if !f.passwd.value => 1 else 0
+        s.passwd = if !f.passwd.value => 1 else if "#{f.passwd.value}".length < 8 => 2 else 0
       if auth.act == \login => s.displayname = 0
       else s.displayname = if !f.displayname.value => 1 else if !!f.displayname.value => 0 else 2
     root: authpanel
@@ -116,7 +117,7 @@ init-authpanel = (dom) ->
       .then -> auth.consent {timing: \signin, bypass: true}
       .then -> auth.fire("auth.signin")
       .catch ->
-        if auth.act == \signup => action.info \signup-failed
+        if !auth.act or auth.act == \signup => action.info \signup-failed
         else action.info \failed
         form.fields.passwd.value = null
         form.check {n: \passwd, now: true}

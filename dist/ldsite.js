@@ -156,11 +156,9 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
           s.email = 2;
         }
         if (s.passwd !== 1) {
-          if (auth.act !== 'login' && (f.passwd.value + "").length < 8) {
-            s.passwd = 2;
-          } else {
-            s.passwd = !f.passwd.value ? 1 : 0;
-          }
+          s.passwd = !f.passwd.value
+            ? 1
+            : (f.passwd.value + "").length < 8 ? 2 : 0;
         }
         if (auth.act === 'login') {
           return s.displayname = 0;
@@ -239,7 +237,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
       }).then(function(){
         return auth.fire("auth.signin");
       })['catch'](function(){
-        if (auth.act === 'signup') {
+        if (!auth.act || auth.act === 'signup') {
           action.info('signup-failed');
         } else {
           action.info('failed');
