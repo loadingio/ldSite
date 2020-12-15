@@ -1,5 +1,21 @@
 # ldSite
 
+**NOTE**
+
+this module is deprecated and should be replaced with individual modules, including:
+
+ - `util.ls` - @plotdb/httputil ( npm:@plotdb/httputil, github:plotdb/httputil )
+ - `ldcvmgr.ls` - ldcvmgr ( npm:ldcvmgr, github:loadingio/ldcvmgr )
+ - `notify.ls` - ldnotify ( npm:ldnotify, github:loadingio/ldnotify ) 
+ - loader - simply use `ldLoader` will do.
+ - error - TBD
+ - auth - TBD
+ - navtop - TBD
+ - recaptcha - TBD
+
+
+# Brief
+
 necessary frontend cores for a generic website, including:
 
  * `auth` - for authentication
