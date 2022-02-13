@@ -453,7 +453,7 @@ ldc.register('auth', ['ldsite', 'ldcvmgr', 'loader', 'util', 'error'], function(
       })[0] : null;
       promise = ret
         ? Promise.resolve(JSON.parse(decodeURIComponent(ret[1])))
-        : ld$.fetch(auth.api + "/global", {}, {
+        : ld$.fetch(auth.api + "/global?dec=" + Math.random().toString(36).substring(2), {}, {
           type: 'json'
         });
       return promise.then(function(it){

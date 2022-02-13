@@ -236,7 +236,7 @@ auth = do
         .0
     else null
     promise = if ret => Promise.resolve JSON.parse(decodeURIComponent(ret.1))
-    else ld$.fetch "#{auth.api}/global", {}, {type: \json}
+    else ld$.fetch "#{auth.api}/global?dec=#{Math.random!toString(36).substring(2)}", {}, {type: \json}
     promise
       .then ~>
         hint-fail.cancel!
