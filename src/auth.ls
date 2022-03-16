@@ -1,5 +1,44 @@
 ({ldsite,ldcvmgr,loader,util,error}) <- ldc.register \auth, <[ldsite ldcvmgr loader util error]>, _
 
+i18n =
+  "en":
+    "註冊失敗。": "Failed to Sign Up"
+    "您可能先前已經註冊過了，或者您所填的資訊有問題。您可以試著：": "You might have signed up before or some information you filled were incorrect. You can try:"
+    "切換至登入模式後再試一次": "switch to login and try again"
+    "試著使用更複雜的密碼": "try a longer password"
+    "嘗試使用社群帳號登入": "try logging in with social accounts"
+    "與我們聯絡": "contact us"
+    "登入失敗。": "Failed to Log in"
+    "您之前可能用的是別組帳號或密碼、使用不同的登入方式、甚至尚未註冊過。您可以試著：": "If you did sign up before, you probably were using another account/password or different login method befre. You can try:"
+    "換一組帳號、密碼或登入方式": "try with another account / password"
+    "確認您的 email 或密碼沒有打錯": "make sure you have your email / password correctly filled"
+    "切換至註冊模式後再試一次": "switch to sign up then try again"
+    "重設密碼": "reset password"
+    "歡迎您！": "Welcome!"
+    "您受邀成為我們的一員。不過，在繼續之前您需要先登入系統。": "please login before continue"
+    "登入系統": "Log in"
+    "電子郵件即為您的帳號。若您代表您的團隊註冊，建議您使用一個團隊可共用的電子郵件。": "Please use email as your account name"
+    "登入之後即可進行提案、系統管理或評選工作。": ""
+    "註冊": "Sign Up"
+    "登入": "Log in"
+    "電子郵件": "email"
+    "電子郵件即您的帳號名稱": "use email as your account name"
+    "無效的電子郵件": "invalid email"
+    "顯示名稱": "display name"
+    "例如：王小明": "e.g., Johnny"
+    "不能留白": "required"
+    "密碼": "password"
+    "密碼，至少八個字元": "at least 8 characters"
+    "不合格的密碼": "invalid password"
+    "登入即表示您同意我們的": "If you login, you agree to our"
+    "用戶條款": "Term of Use"
+    "隱私權政策": "Privacy Policy"
+    "與": "and"
+    "忘記密碼？»": "forget passowrd？»"
+    "或者用下列登入": "or login with:"
+  "zh-TW": {}
+
+
 #prevent global object been altered accidentally
 global = -> if lc.global => JSON.parse(JSON.stringify lc.global) else null
 [lc,el] = [{}, {}]
@@ -63,8 +102,20 @@ init-authpanel = (dom) ->
   authpanel = lc.authpanel = if dom => that else ld$.find document, \.authpanel, 0
   if !lc.authpanel or lc.inited => return
   lc.inited = true
-
-
+  ts = ld$.find authpanel, '[t]'
+  for k,v of i18n.en => if !i18n["zh-TW"][k] => i18n["zh-TW"][k] = k
+  if i18next? =>
+    for k,v of i18n => i18next.add-resource-bundle k, '', v, true, true
+    update = ->
+      ts.map (node) ->
+        if !(node.t?) => node.t = node.textContent
+        for i from 0 til node.attributes.length =>
+          {name,value} = node.attributes[i]
+          if !(ret = /t-(.+)$/.exec(name)) => continue
+          node.setAttribute ret.1, i18next.t(value or '')
+        node.innerText = i18next.t(node.t)
+    i18next.on \languageChanged, update
+    update!
   acts = ld$.find authpanel, '[data-action]'
   authpanel.addEventListener \click, (e) ->
     if !e or !(n = e.target) or !e.target.getAttribute => return
