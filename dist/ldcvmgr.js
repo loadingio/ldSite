@@ -56,6 +56,9 @@
             return root = div.querySelector('.ldcv');
           });
         return p.then(function(root){
+          if (typeof i18nEngine != 'undefined' && i18nEngine !== null) {
+            i18nEngine.transform(root);
+          }
           this$.covers[n] = new ldCover({
             root: root,
             lock: root.getAttribute('data-lock') === 'true'

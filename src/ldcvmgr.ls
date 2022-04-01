@@ -32,6 +32,7 @@
             root = div.querySelector('.ldcv')
       p
         .then (root) ~>
+          if i18n-engine? => i18n-engine.transform root
           @covers[n] = new ldCover root: root, lock: root.getAttribute(\data-lock) == \true
           ldcvmgr.prepare-proxy.resolve!
           delete @workers[n]
