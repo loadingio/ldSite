@@ -7,7 +7,7 @@
       cookie: function(k, v, expire){
         var hash;
         if (v) {
-          return document.cookie = (k + "=" + v) + (expire ? ";expires=" + expire : "");
+          return document.cookie = (k + "=" + v + ";path=/") + (expire ? ";expires=" + expire : "");
         }
         hash = {};
         (document.cookie || '').split(';').map(function(it){
