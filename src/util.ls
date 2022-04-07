@@ -3,7 +3,7 @@
     local = {}
     return do
       cookie: (k,v,expire) ->
-        if v => return document.cookie = "#k=#v" + (if expire => ";expires=#expire" else "")
+        if v => return document.cookie = "#k=#v;path=/" + (if expire => ";expires=#expire" else "")
         hash = {}
         (document.cookie or '')
           .split(\;)
