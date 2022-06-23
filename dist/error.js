@@ -27,6 +27,9 @@
       1005: function(){
         return ldcvmgr.toggle('csrftoken-mismatch');
       },
+      1006: function(){
+        return ldcvmgr.toggle('timeout');
+      },
       1016: function(){
         return ldcvmgr.toggle('not-yet-available');
       },

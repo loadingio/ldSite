@@ -9,6 +9,7 @@
       1000: -> ldcvmgr.toggle('auth-required')
       1004: -> ldcvmgr.toggle('assets-quota-exceeded')
       1005: -> ldcvmgr.toggle('csrftoken-mismatch')
+      1006: -> ldcvmgr.toggle('timeout')
       1016: -> ldcvmgr.toggle('not-yet-available')
       1018: -> ldcvmgr.toggle('consent-required')
     ret = (opt = {}) -> (e) ->
